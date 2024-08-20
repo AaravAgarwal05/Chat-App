@@ -1,10 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import EmojiPicker from "emoji-picker-react";
+import Image from "next/image";
 
 const Chat = () => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [message, setMessage] = useState("");
+
+  const endRef = useRef(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const handleEmoji = (e) => {
     setMessage((prev) => prev + e.emoji);
@@ -15,11 +22,11 @@ const Chat = () => {
     <div className="flex flex-col flex-[2] border-l border-r border-solid border-[#dddddd35] h-full">
       <div className="top p-5 flex items-center justify-between border-b border-solid border-[#dddddd35]">
         <div className="user flex items-center gap-5">
-          <img
+          <Image
             height={60}
             width={60}
             className="rounded-full object-cover"
-            src="./Avatar.png"
+            src="/avatar.png"
             alt=""
           />
           <div className="texts flex flex-col gap-1.5">
@@ -30,18 +37,18 @@ const Chat = () => {
           </div>
         </div>
         <div className="icons flex gap-5 items-center justify-center">
-          <img height={20} width={20} src="./phone.png" alt="" />
-          <img height={20} width={20} src="./video.png" alt="" />
-          <img height={20} width={20} src="./info.png" alt="" />
+          <Image height={20} width={20} src="/phone.png" alt="" />
+          <Image height={20} width={20} src="/video.png" alt="" />
+          <Image height={20} width={20} src="/info.png" alt="" />
         </div>
       </div>
       <div className="center flex-[1] p-5 overflow-auto flex flex-col gap-5">
         <div className="message max-w-[70%] flex gap-5">
-          <img
+          <Image
             height={30}
             width={30}
             className="rounded-full object-cover self-start"
-            src="./Avatar.png"
+            src="/avatar.png"
             alt=""
           />
           <div className="texts flex-[1] flex flex-col gap-1.5">
@@ -56,7 +63,13 @@ const Chat = () => {
         </div>
         <div className="message max-w-[70%] flex gap-5 own self-end">
           <div className="texts flex-[1] flex flex-col gap-1.5">
-            <img height={300} width="100%" className="rounded-lg object-cover self-start" src="https://www.shutterstock.com/image-photo/maldives-islands-ocean-tropical-beach-600nw-1938868960.jpg" alt="" />
+            <Image
+              height={300}
+              width={1000}
+              className="h-80 rounded-lg object-cover self-start"
+              src="/bg.webp"
+              alt=""
+            />
             <p className="p-5 bg-[#5183fe] rounded-lg text-sm">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum
               repellat nulla laborum aperiam sunt, tempore, cupiditate mollitia
@@ -66,28 +79,29 @@ const Chat = () => {
             <span className="text-sm">1 min ago</span>
           </div>
         </div>
+        <div ref={endRef}></div>
       </div>
       <div className="bottom mt-auto p-5 gap-5 flex items-center justify-between border-t border-solid border-[#dddddd35]">
         <div className="icons flex items-center justify-center gap-5">
-          <img
+          <Image
             height={20}
             width={20}
             className="cursor-pointer"
-            src="./img.png"
+            src="/Image.png"
             alt=""
           />
-          <img
+          <Image
             height={20}
             width={20}
             className="cursor-pointer"
-            src="./camera.png"
+            src="/camera.png"
             alt=""
           />
-          <img
+          <Image
             height={20}
             width={20}
             className="cursor-pointer"
-            src="./mic.png"
+            src="/mic.png"
             alt=""
           />
         </div>
@@ -101,12 +115,12 @@ const Chat = () => {
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="emoji relative ">
-          <img
+          <Image
             height={20}
             width={20}
             className="cursor-pointer"
             onClick={() => setShowEmoji((prev) => !prev)}
-            src="./emoji.png"
+            src="/emoji.png"
             alt=""
           />
           <div className="picker absolute bottom-12 left-0">
