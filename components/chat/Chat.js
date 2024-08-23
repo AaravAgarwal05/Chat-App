@@ -87,7 +87,7 @@ const Chat = () => {
             height={20}
             width={20}
             className="cursor-pointer"
-            src="/Image.png"
+            src="/image.png"
             alt=""
           />
           <Image
