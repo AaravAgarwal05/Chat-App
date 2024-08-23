@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { toast, Bounce } from "react-toastify";
 
 const Login = () => {
   const [avatar, setAvatar] = useState({
@@ -16,6 +17,22 @@ const Login = () => {
       });
     }
   };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    toast.success("Account Created Successfully 🥳", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    });
+  };
+
   return (
     <>
       <div className="login w-full h-full flex items-center gap-24">
@@ -60,7 +77,10 @@ const Login = () => {
         <div className="separator h-4/5 w-0.5 bg-[#dddddd35]"></div>
         <div className="item flex-[1] flex flex-col items-center gap-5">
           <h2 className="text-2xl font-medium">Create an Account</h2>
-          <form className="flex flex-col items-center justify-center gap-5">
+          <form
+            className="flex flex-col items-center justify-center gap-5"
+            onSubmit={handleLogin}
+          >
             <label
               className="h-12 self-start font-normal text-lg cursor-pointer w-full flex items-center justify-between underline"
               htmlFor="file"
