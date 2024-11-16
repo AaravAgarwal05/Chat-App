@@ -97,6 +97,9 @@ const Login = () => {
           });
           if (res3.data.status === 200) {
             showToast(res.data.message, "success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 5000);
             setIsLoading((prev) => !prev);
             setSignUpForm({
               name: "",

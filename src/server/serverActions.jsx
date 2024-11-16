@@ -60,30 +60,6 @@ export const createUser = async (name, username, email, password) => {
   }
 };
 
-export const findUser = async (uid) => {
-  try {
-    await connectDB();
-
-    const userById = await User.findById(uid);
-
-    if (!userById) {
-      return {
-        status: 400,
-        message: "User not found 😥",
-      };
-    }
-
-    return {
-      status: 200,
-      message: "User found successfully 🥳",
-      user: userById,
-    };
-  } catch (err) {
-    console.error("Failed to find user", err);
-    throw err;
-  }
-};
-
 export const updateUserImageURL = async (email, fileName) => {
   try {
     await connectDB();
