@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { updateUserImageURL } from "@/src/server/serverActions";
+import { NextResponse, NextRequest } from "next/server";
+import { updateUserImageURL } from "@/server/serverActions";
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
     const { email, fileName } = reqBody;

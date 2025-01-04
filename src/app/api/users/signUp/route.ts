@@ -1,15 +1,14 @@
-import { NextResponse } from "next/server";
-import { getSignedURL } from "@/src/server/serverActions";
+import { NextResponse, NextRequest } from "next/server";
+import { createUser } from "@/server/serverActions";
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { fileName } = reqBody;
-    const response = await getSignedURL(fileName);
+    const { name, username, email, password } = reqBody;
+    const response = await createUser(name, username, email, password);
     return NextResponse.json({
       status: response.status,
       message: response.message,
-      url: response.url,
     });
   } catch (error) {
     if (error instanceof Error) {

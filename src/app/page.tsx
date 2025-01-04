@@ -5,27 +5,14 @@ import Chat from "../components/chat/chat";
 import Detail from "../components/detail/detail";
 import Login from "../components/login/login";
 import Notification from "../components/notification/notification";
-import { getSession } from "../server/serverActions";
 
 export default function Home() {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<{ email: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const session = await getSession();
-        if (session.user) {
-          setCurrentUser(session.user);
-        }
-      } catch (error) {
-        console.error("Error fetching session:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSession();
+    setIsLoading(false);
+    setCurrentUser({ email: "test" });
   }, []);
 
   if (isLoading) {

@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { signOut } from "@/src/server/serverActions";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    const response = await signOut();
+    const reqBody = await request.json();
+    const { email, password } = reqBody;
     return NextResponse.json({
-      status: response.status,
-      message: response.message,
+      status: 200,
+      message: `User ${email} with password ${password} logged in`,
     });
   } catch (error) {
     if (error instanceof Error) {

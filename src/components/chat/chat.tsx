@@ -7,13 +7,17 @@ const Chat = () => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [message, setMessage] = useState("");
 
-  const endRef = useRef(null);
+  const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  const handleEmoji = (e) => {
+  interface EmojiClickEvent {
+    emoji: string;
+  }
+
+  const handleEmoji = (e: EmojiClickEvent): void => {
     setMessage((prev) => prev + e.emoji);
     setShowEmoji(false);
   };
