@@ -1,17 +1,12 @@
 import Image from "next/image";
-import axios from "axios";
+import { signOut } from "next-auth/react";
 import showToast from "../showToast/showToast";
 
 const Detail = () => {
   const handleLogout = async () => {
     try {
-      const response = await axios.get("/api/users/logOut");
-      if (response.data.status === 200) {
-        showToast(response.data.message, "success");
-        setTimeout(() => {
-          window.location.reload();
-        }, 5000);
-      }
+      showToast("User logged out Successfully 😥", "error");
+      await signOut();
     } catch (error) {
       console.error("Error logging out:", error);
     }

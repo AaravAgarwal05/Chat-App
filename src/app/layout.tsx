@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import SessionWrapper from "@/components/sessionWrapper/sessionWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,8 +49,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body
         className={`${inter.className} m-0 p-0 box-border flex items-center justify-center h-screen w-screen text-white`}
         style={{ backgroundImage: `url('/bg.jpg')` }}
+        cz-shortcut-listen="true"
       >
-        {children}
+        <SessionWrapper>{children}</SessionWrapper>
       </body>
     </html>
   );

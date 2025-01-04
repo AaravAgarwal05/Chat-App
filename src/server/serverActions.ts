@@ -4,7 +4,49 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3Bucket from "../aws/s3Bucket";
 import connectDB from "../db/connectDB";
 import User from "../models/user";
-import bcrypt from "bcryptjs";
+
+interface fetchUserResponse {
+  status: number;
+  message: string;
+  user: {
+    name: string;
+    username: string;
+    email: string;
+    profilePictureURL: string;
+  } | null;
+}
+
+export const fetchUser = async (email: string): Promise<fetchUserResponse> => {
+  try {
+    await connectDB();
+
+    const userByEmail = await User.findOne({
+      email: email,
+    });
+
+    if (!userByEmail) {
+      return {
+        status: 400,
+        message: "Account doesn't exist with this email 😥",
+        user: null,
+      };
+    }
+
+    return {
+      status: 200,
+      message: "User fetched successfully 🥳",
+      user: {
+        name: userByEmail.name,
+        username: userByEmail.username,
+        email: userByEmail.email,
+        profilePictureURL: userByEmail.profilePictureURL,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch user", error);
+    throw error;
+  }
+};
 
 interface SignedURLResponse {
   status: number;
@@ -12,7 +54,9 @@ interface SignedURLResponse {
   url: string;
 }
 
-export const getSignedURL = async (fileName: string): Promise<SignedURLResponse> => {
+export const getSignedURL = async (
+  fileName: string
+): Promise<SignedURLResponse> => {
   const putCommand = new PutObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME!,
     Key: fileName,
@@ -32,7 +76,10 @@ interface CreateUserResponse {
 }
 
 export const createUser = async (
-  name: string,
+  fullName: {
+    firstName: string;
+    lastName: string;
+  },
   username: string,
   email: string,
   password: string
@@ -41,7 +88,7 @@ export const createUser = async (
     await connectDB();
 
     const userByEmail = await User.findOne({ email: email });
-
+    console.log(userByEmail);
     if (userByEmail) {
       return {
         status: 400,
@@ -58,13 +105,11 @@ export const createUser = async (
       };
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({
-      name: name,
+      fullName: fullName,
       username: username,
       email: email,
-      password: hashedPassword,
+      password: password,
     });
     await newUser.save();
     return { status: 200, message: "Account Created Successfully 🥳" };
@@ -106,4 +151,3 @@ export const updateUserImageURL = async (
     throw err;
   }
 };
-

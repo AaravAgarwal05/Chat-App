@@ -5,14 +5,16 @@ import Chat from "../components/chat/chat";
 import Detail from "../components/detail/detail";
 import Login from "../components/login/login";
 import Notification from "../components/notification/notification";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const [currentUser, setCurrentUser] = useState<{ email: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    setIsLoading(false);
-    setCurrentUser({ email: "test" });
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
   }, []);
 
   if (isLoading) {
@@ -26,7 +28,7 @@ export default function Home() {
       <>
         <Notification />
         <div className="main w-[90vw] h-[90vh] bg-[rgba(17,25,40,0.75)] backdrop-blur-xl backdrop-saturate-200 rounded-xl border border-solid border-[rgba(255,255,255,0.125)] flex">
-          {currentUser ? (
+          {session ? (
             <>
               <List />
               <Chat />

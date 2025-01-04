@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import showToast from "../showToast/showToast";
+import { signIn } from "next-auth/react";
 import axios from "axios";
 
 const Login = () => {
@@ -11,7 +12,10 @@ const Login = () => {
   }
 
   interface SignUpForm {
-    name: string;
+    fullName: {
+      firstName: string;
+      lastName: string;
+    };
     username: string;
     email: string;
     password: string;
@@ -24,12 +28,18 @@ const Login = () => {
 
   const [avatar, setAvatar] = useState<Avatar>({ file: null, url: "" });
   const [signUpForm, setSignUpForm] = useState<SignUpForm>({
-    name: "",
+    fullName: {
+      firstName: "",
+      lastName: "",
+    },
     username: "",
     email: "",
     password: "",
   });
-  const [logInForm, setLogInForm] = useState<LogInForm>({ email: "", password: "" });
+  const [logInForm, setLogInForm] = useState<LogInForm>({
+    email: "",
+    password: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   interface HandleAvatarEvent extends React.ChangeEvent<HTMLInputElement> {
@@ -50,23 +60,39 @@ const Login = () => {
     formType: "login" | "signup"
   ): void => {
     const { name, value } = e.target;
+
     if (formType === "login") {
       setLogInForm({ ...logInForm, [name]: value });
     } else {
-      setSignUpForm({ ...signUpForm, [name]: value });
+      if (name === "firstName" || name === "lastName") {
+        setSignUpForm({
+          ...signUpForm,
+          fullName: {
+            ...signUpForm.fullName,
+            [name]: value,
+          },
+        });
+      } else {
+        setSignUpForm({ ...signUpForm, [name]: value });
+      }
     }
   };
 
-  const handleLogIn = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleLogIn = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await axios.post("/api/users/logIn", logInForm);
-      if (res.data.status === 200) {
-        showToast(res.data.message, "success");
-        setTimeout(() => window.location.reload(), 5000);
+      const res = await signIn("credentials", {
+        email: logInForm.email,
+        password: logInForm.password,
+        redirect: false,
+      });
+      if (res!.status === 200) {
+        showToast("Logged in successfully 🥳", "success");
       } else {
-        showToast(res.data.message, "error");
+        showToast(res?.error || "An unknown error occurred", "error");
       }
     } catch (error) {
       showToast("An error occurred during login", "error");
@@ -76,7 +102,9 @@ const Login = () => {
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSignUp = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
     try {
@@ -115,7 +143,10 @@ const Login = () => {
     <div className="flex items-center w-full h-full gap-24 login">
       <div className="item flex-[1] flex flex-col items-center gap-5 w-full">
         <h2 className="text-2xl font-medium">Welcome back,</h2>
-        <form className="flex flex-col items-center justify-center w-1/2 gap-5" onSubmit={handleLogIn}>
+        <form
+          className="flex flex-col items-center justify-center w-1/2 gap-5"
+          onSubmit={handleLogIn}
+        >
           {Object.entries(logInForm).map(([key, value]) => (
             <div className="w-full h-full" key={key}>
               <div className="flex flex-col w-full gap-1">
@@ -134,7 +165,10 @@ const Login = () => {
               </div>
             </div>
           ))}
-          <button className="w-full p-5 border-none outline-none text-white rounded-md cursor-pointer bg-[#1f8ef1] font-medium flex justify-center items-center" type="submit">
+          <button
+            className="w-full p-5 border-none outline-none text-white rounded-md cursor-pointer bg-[#1f8ef1] font-medium flex justify-center items-center"
+            type="submit"
+          >
             {isLoading ? "Loading..." : "Log In"}
           </button>
         </form>
@@ -144,9 +178,21 @@ const Login = () => {
 
       <div className="item flex-[1] flex flex-col items-center gap-5 w-full">
         <h2 className="text-2xl font-medium">Create an Account</h2>
-        <form className="flex flex-col items-center justify-center w-1/2 gap-5" onSubmit={handleSignUp}>
-          <label className="flex items-center self-start justify-center w-full h-12 gap-10 text-lg font-normal underline cursor-pointer" htmlFor="file">
-            <Image height={60} width={60} src={avatar.url || "/avatar.png"} alt="Avatar" className="object-cover rounded-xl opacity-60" />
+        <form
+          className="flex flex-col items-center justify-center w-1/2 gap-5"
+          onSubmit={handleSignUp}
+        >
+          <label
+            className="flex items-center self-start justify-center w-full h-12 gap-10 text-lg font-normal underline cursor-pointer"
+            htmlFor="file"
+          >
+            <Image
+              height={60}
+              width={60}
+              src={avatar.url || "/avatar.png"}
+              alt="Avatar"
+              className="object-cover rounded-xl opacity-60"
+            />
             Upload an Image
           </label>
           <input
@@ -157,25 +203,72 @@ const Login = () => {
             id="file"
             onChange={handleAvatar}
           />
-          {Object.entries(signUpForm).map(([key, value]) => (
-            <div className="w-full h-full" key={key}>
-              <div className="flex flex-col w-full gap-1">
-                <label className="self-start text-lg font-normal" htmlFor={key}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </label>
-                <input
-                  className="p-5 border-none outline-none bg-[rgba(17,25,40,0.6)] text-white rounded-md"
-                  type={key === "password" ? "password" : "text"}
-                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-                  value={value}
-                  onChange={(e) => handleInputChange(e, "signup")}
-                  name={key}
-                  id={key}
-                />
-              </div>
+          <div className="w-full h-full flex">
+            <div className="flex flex-col w-1/2 gap-1">
+              <label
+                className="self-start text-lg font-normal"
+                htmlFor="firstName"
+              >
+                First Name
+              </label>
+              <input
+                className="p-5 mr-2 border-none outline-none bg-[rgba(17,25,40,0.6)] text-white rounded-md"
+                type="text"
+                placeholder="First Name"
+                value={signUpForm.fullName.firstName}
+                onChange={(e) => handleInputChange(e, "signup")}
+                name="firstName"
+                id="firstName"
+                required
+              />
             </div>
-          ))}
-          <button className="w-full p-5 border-none outline-none text-white rounded-md cursor-pointer bg-[#1f8ef1] font-medium flex justify-center items-center" type="submit">
+            <div className="flex flex-col w-1/2 gap-1">
+              <label
+                className="self-start text-lg font-normal"
+                htmlFor="lastName"
+              >
+                Last Name
+              </label>
+              <input
+                className="p-5 ml-2 border-none outline-none bg-[rgba(17,25,40,0.6)] text-white rounded-md"
+                type="text"
+                placeholder="Last Name"
+                value={signUpForm.fullName.lastName}
+                onChange={(e) => handleInputChange(e, "signup")}
+                name="lastName"
+                id="lastName"
+                required
+              />
+            </div>
+          </div>
+          {Object.entries(signUpForm)
+            .filter(([key]) => key !== "fullName")
+            .map(([key, value]) => (
+              <div className="w-full h-full" key={key}>
+                <div className="flex flex-col w-full gap-1">
+                  <label
+                    className="self-start text-lg font-normal"
+                    htmlFor={key}
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </label>
+                  <input
+                    className="p-5 border-none outline-none bg-[rgba(17,25,40,0.6)] text-white rounded-md"
+                    type={key === "password" ? "password" : "text"}
+                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                    value={value as string}
+                    onChange={(e) => handleInputChange(e, "signup")}
+                    name={key}
+                    id={key}
+                    required
+                  />
+                </div>
+              </div>
+            ))}
+          <button
+            className="w-full p-5 border-none outline-none text-white rounded-md cursor-pointer bg-[#1f8ef1] font-medium flex justify-center items-center"
+            type="submit"
+          >
             {isLoading ? "Loading..." : "Sign Up"}
           </button>
         </form>
